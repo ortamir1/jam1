@@ -44,8 +44,6 @@ public class playeractions : MonoBehaviour
     //curr rigidbody
     private Rigidbody CurrRigid;
 
-    private float timeStart;
-
     // Start is called before the first f   rame update
     void Start()
     {
@@ -63,7 +61,7 @@ public class playeractions : MonoBehaviour
         CurrRigid = players[WhosTurn].GetComponent<Rigidbody>();
         target = CurrRigid.position;
         isMove = false;
-        timeStart = Time.time;
+        StartCoroutine(turnswitch());
     }
 
 // Update is called once per frame
@@ -72,13 +70,6 @@ void Update()
         //if move it moves the currents player rigidBody, then it will change to shoot
         //until someone fires then it will switch the players turn, also i will be conting on changing the  
         // death flag in the array via trigger on impact by hitting the water 
-        if(Time.time - timeStart >= mTurntime && canSwitch())
-        {
-            //todo: make a visual representation of the turn ending cause otherwise its really trippy
-            Debug.Log("next turn");
-            state = turn_state.end;
-            timeStart = Time.time;
-        }
         switch (state)
         {
             case turn_state.move:
@@ -203,8 +194,16 @@ void Update()
         //todo: end the game when pAlive is 1, maybe add a public int that says how many are alive and then and it
     }
 
-    private IEnumerator turnswitch(int turn_time)
+    private IEnumerator turnswitch()
     {
-
+        while (true)
+        {
+            if (canSwitch())
+            {
+                yield return new WaitForSeconds(mTurntime);
+                Debug.Log("next turn");
+                state = turn_state.end;
+            }
+        }
     }
 }
